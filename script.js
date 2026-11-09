@@ -73,15 +73,13 @@ const storySlides = [
   "WhatsApp Image 2026-11-10 at 01.43.01.jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.02 (1).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03.jpeg",
-  "WhatsApp Image 2026-11-10 at 01.43.02.jpeg",
-  "WhatsApp Image 2026-11-10 at 01.43.03 (1).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (5).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (7).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03 (10).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03 (2).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03 (3).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03 (4).jpeg",
-  "WhatsApp Image 2026-11-10 at 01.43.03 (5).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03 (6).jpeg",
-  "WhatsApp Image 2026-11-10 at 01.43.03 (7).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03 (8).jpeg",
   "WhatsApp Image 2026-11-10 at 01.43.03 (9).jpeg"
 ].map((filename, index) => ({
@@ -110,9 +108,14 @@ function startAutoCarousel() {
 }
 
 function syncCarouselToAudio() {
-  if (!photosRevealed || !Number.isFinite(audio.duration) || audio.currentTime < 7) return;
-  const slideDuration = (audio.duration - 7) / storySlides.length;
-  const nextIndex = Math.min(storySlides.length - 1, Math.floor((audio.currentTime - 7) / slideDuration));
+  if (!photosRevealed || !Number.isFinite(audio.duration) || audio.currentTime < 6) return;
+  if (audio.currentTime >= audio.duration - 2) {
+    modalPhotoFrame.classList.add("is-hidden");
+    modalTitle.innerHTML = "That’s a wrap.<br /><em>Happy birthday, Dino!</em>";
+    return;
+  }
+  const slideDuration = (audio.duration - 8) / storySlides.length;
+  const nextIndex = Math.min(storySlides.length - 1, Math.floor((audio.currentTime - 6) / slideDuration));
   if (nextIndex !== modalSlideIndex) updateModalSlide(nextIndex);
 }
 
@@ -152,7 +155,7 @@ function closeStoryModal() {
 }
 
 audio.addEventListener("timeupdate", () => {
-  if (audio.currentTime >= 7) revealMemoryCarousel();
+  if (audio.currentTime >= 6) revealMemoryCarousel();
   syncCarouselToAudio();
 });
 

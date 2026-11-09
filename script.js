@@ -70,32 +70,50 @@ photoTrack.addEventListener("touchend", (event) => {
 }, { passive: true });
 
 const storySlides = [
-  { src: "images/person-1.jpg", alt: "Dino smiling", label: "the birthday legend" },
-  { src: "images/person-2.jpg", alt: "Dino being fabulous", label: "zero thoughts, just vibes" },
-  { src: "images/person-3.jpg", alt: "Dino having fun", label: "still iconic somehow" }
-];
+  "WhatsApp Image 2026-11-10 at 01.43.01.jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.02 (1).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03.jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.02.jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (1).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (10).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (2).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (3).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (4).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (5).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (6).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (7).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (8).jpeg",
+  "WhatsApp Image 2026-11-10 at 01.43.03 (9).jpeg"
+].map((filename, index) => ({
+  src: `images/${encodeURIComponent(filename)}`,
+  alt: `Dino birthday memory ${index + 1}`,
+  label: index === 0 ? "the birthday legend" : filename.endsWith("01.43.03.jpeg") ? "still iconic somehow" : "zero thoughts, just vibes"
+}));
+let modalSlideIndex = 0;
 
 function updateModalSlide(index) {
-  const slide = storySlides[index % storySlides.length];
+  modalSlideIndex = Math.max(0, Math.min(index, storySlides.length - 1));
+  const slide = storySlides[modalSlideIndex];
   modalPhoto.style.opacity = "0";
   window.setTimeout(() => {
     modalPhoto.src = slide.src;
     modalPhoto.alt = slide.alt;
     modalPhotoLabel.textContent = slide.label;
-    modalCounter.textContent = `0${(index % storySlides.length) + 1} / 0${storySlides.length}`;
-    modalProgress.style.width = `${((index % storySlides.length) + 1) / storySlides.length * 100}%`;
+    modalCounter.textContent = `${String(modalSlideIndex + 1).padStart(2, "0")} / ${storySlides.length}`;
+    modalProgress.style.width = `${((modalSlideIndex + 1) / storySlides.length) * 100}%`;
     modalPhoto.style.opacity = "1";
   }, 180);
 }
 
 function startAutoCarousel() {
-  let slideIndex = 0;
-  updateModalSlide(slideIndex);
-  window.clearInterval(carouselTimer);
-  carouselTimer = window.setInterval(() => {
-    slideIndex = (slideIndex + 1) % storySlides.length;
-    updateModalSlide(slideIndex);
-  }, 2800);
+  updateModalSlide(0);
+}
+
+function syncCarouselToAudio() {
+  if (!photosRevealed || !Number.isFinite(audio.duration) || audio.currentTime < 7) return;
+  const slideDuration = (audio.duration - 7) / storySlides.length;
+  const nextIndex = Math.min(storySlides.length - 1, Math.floor((audio.currentTime - 7) / slideDuration));
+  if (nextIndex !== modalSlideIndex) updateModalSlide(nextIndex);
 }
 
 function revealMemoryCarousel() {
@@ -135,6 +153,7 @@ function closeStoryModal() {
 
 audio.addEventListener("timeupdate", () => {
   if (audio.currentTime >= 7) revealMemoryCarousel();
+  syncCarouselToAudio();
 });
 
 revealButton.addEventListener("click", openStoryModal);
